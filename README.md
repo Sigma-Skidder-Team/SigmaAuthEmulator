@@ -1,5 +1,5 @@
 # SigmaAuthEmulator
-A kind of simple auth emulator Sigma Jello
+A kinda simple authentication emulator for Sigma Jello. Except the setup part.
 
 ## Usage
 1. First download [mkcert.dev](https://github.com/FiloSottile/mkcert/releases/tag/v1.4.4)
