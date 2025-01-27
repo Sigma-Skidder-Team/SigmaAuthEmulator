@@ -4,15 +4,21 @@ import java.io.*;
 
 public class FileUtil {
 
-    public static String readFile(File file) throws IOException {
-        StringBuilder content = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                content.append(line).append(System.lineSeparator());
-            }
+    //from: https://sentry.io/answers/inputstream-to-string/
+    public static String toString_ByteArrayOutputStream(InputStream stream) throws IOException {
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        byte[] buffer = new byte[1024];
+
+        int readBytes = stream.read(buffer);
+
+        while(readBytes != -1){
+            outputStream.write(buffer, 0, readBytes);
+            readBytes = stream.read(buffer);
         }
-        return content.toString().trim();
+
+        return outputStream.toString();
     }
 
     public static String readInputStream(InputStream inputStream) throws IOException {
