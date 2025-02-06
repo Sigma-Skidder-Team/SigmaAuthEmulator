@@ -82,6 +82,7 @@ public class SigmaHandler implements HttpHandler {
 
                 jsonResponse.put("auth_token", uid);
                 jsonResponse.put("agora_token", uid);
+                jsonResponse.put("session", "test");
 
                 jsonResponse.put("token", uid);
                 jsonResponse.put("success", true);
