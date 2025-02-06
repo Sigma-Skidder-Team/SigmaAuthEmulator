@@ -42,6 +42,19 @@ public class SigmaHandler implements HttpHandler {
 
             response = content;
             exchange.sendResponseHeaders(202, response.length());
+        } else if (uri.contains("/profiles.php?v=")) {
+            response = "[\"Intave\", \"BlocksMC\"]";
+            exchange.sendResponseHeaders(202, response.length());
+        } else {
+            if (uri.contains("/profiles/") && uri.contains(".profile")) {
+                if (uri.contains("Intave")) {
+                    response = getConfig("Intave");
+                } else if (uri.contains("BlocksMC")) {
+                    response = getConfig("BlocksMC");
+                }
+
+                exchange.sendResponseHeaders(202, response.length());
+            }
         }
 
         switch (uri) {
@@ -100,6 +113,21 @@ public class SigmaHandler implements HttpHandler {
             params.put(key, value);
         }
         return params;
+    }
+
+    private String getConfig(String configName) {
+        try {
+            InputStream inputStream = ClassLoader.getSystemClassLoader().getResourceAsStream(configName + ".profile");
+            String content = getChangelog();
+
+            if (inputStream != null) {
+                content = FileUtil.toString_ByteArrayOutputStream(inputStream);
+            }
+
+            return content;
+        } catch (IOException e) {
+            return "{\"error\": \"Invalid request\"}";
+        }
     }
 
 }
