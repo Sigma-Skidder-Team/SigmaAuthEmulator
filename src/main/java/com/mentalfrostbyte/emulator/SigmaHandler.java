@@ -43,7 +43,7 @@ public class SigmaHandler implements HttpHandler {
             response = content;
             exchange.sendResponseHeaders(202, response.length());
         } else if (uri.contains("/profiles.php?v=")) {
-            response = "[\"Intave\", \"BlocksMC\"]";
+            response = "[\"Intave\", \"BlocksMC\", \"LibreCraft\", \"Mineland\", \"Minemenclub\", \"NoRules\", \"Vulcan\"]";
             exchange.sendResponseHeaders(202, response.length());
         } else {
             if (uri.contains("/profiles/") && uri.contains(".profile")) {
@@ -51,6 +51,16 @@ public class SigmaHandler implements HttpHandler {
                     response = getConfig("Intave");
                 } else if (uri.contains("BlocksMC")) {
                     response = getConfig("BlocksMC");
+                } else if (uri.contains("LibreCraft")) {
+                    response = getConfig("LibreCraft");
+                } else if (uri.contains("Mineland")) {
+                    response = getConfig("Mineland");
+                } else if (uri.contains("Minemenclub")) {
+                    response = getConfig("Minemenclub");
+                } else if (uri.contains("NoRules")) {
+                    response = getConfig("NoRules");
+                } else if (uri.contains("Vulcan")) {
+                    response = getConfig("Vulcan");
                 }
 
                 exchange.sendResponseHeaders(202, response.length());
