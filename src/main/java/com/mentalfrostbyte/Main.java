@@ -18,7 +18,7 @@ public class Main {
                         ".----)   |   |  | |  |__| | |  |  |  |  /  _____  \\  \n" +
                         "|_______/    |__|  \\______| |__|  |__| /__/     \\__\\ \n"
         );
-        System.out.println("Starting Sigma Emulator V2 made by lexi");
+        System.out.println("Starting Sigma Emulator V3 made by lexi");
 
         SSLContext sslContext = SSLUtil.createSSLContext("keystore.p12", "123456");
         HttpsServer server = HttpsServer.create(new InetSocketAddress(443), 0);
