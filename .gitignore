@@ -39,3 +39,5 @@ build/
 /.idea
 *.p12
 *.jar
+
+backup/
