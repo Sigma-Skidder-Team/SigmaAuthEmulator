@@ -1,10 +1,13 @@
 package com.mentalfrostbyte.emulator;
 
+import com.mentalfrostbyte.Main;
 import com.mentalfrostbyte.utils.FileUtil;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.json.JSONObject;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -23,10 +26,11 @@ public class SigmaHandler implements HttpHandler {
         String requestBody = FileUtil.readInputStream(exchange.getRequestBody());
         System.out.println("Request Body: " + requestBody);
 
-        String uid = "5380fed69bda466ca41a9d16d8cf38e5";
+        String uid = "name";
 
         String uri = exchange.getRequestURI().toString();
         String response = "";
+        String username = "niceperson";
 
         JSONObject jsonResponse = new JSONObject();
 
@@ -45,6 +49,19 @@ public class SigmaHandler implements HttpHandler {
         } else if (uri.contains("/profiles.php?v=")) {
             response = "[\"Intave\", \"BlocksMC\", \"LibreCraft\", \"Mineland\", \"Minemenclub\", \"NoRules\", \"Vulcan\"]";
             exchange.sendResponseHeaders(202, response.length());
+        } else if (uri.contains("/captcha/") && uri.endsWith(".png")) {
+            BufferedImage captchaImage = Main.generatedCaptcha.getImage();
+            if (captchaImage != null) {
+                exchange.getResponseHeaders().set("Content-Type", "image/png");
+                exchange.sendResponseHeaders(200, 0);
+                OutputStream os = exchange.getResponseBody();
+                ImageIO.write(captchaImage, "png", os);
+                os.close();
+                return;
+            } else {
+                exchange.sendResponseHeaders(404, -1);
+                return;
+            }
         } else {
             if (uri.contains("/profiles/") && uri.contains(".profile")) {
                 if (uri.contains("Intave")) {
@@ -70,19 +87,21 @@ public class SigmaHandler implements HttpHandler {
         switch (uri) {
             case "/challenge":
                 jsonResponse.put("success", true);
-                jsonResponse.put("premium", true);
                 jsonResponse.put("uid", uid);
+                jsonResponse.put("captcha", true);
+                jsonResponse.put("challengeAnswer", Main.generatedCaptcha.getCode());
 
                 response = jsonResponse.toString();
                 exchange.sendResponseHeaders(202, response.length());
                 break;
             case "/login":
-                jsonResponse.put("username", params.getOrDefault("username", "username"));
+                username = params.getOrDefault("username", "username");
+                jsonResponse.put("username", username);
                 jsonResponse.put("password", params.getOrDefault("password", "123"));
 
                 jsonResponse.put("auth_token", uid);
                 jsonResponse.put("agora_token", uid);
-                jsonResponse.put("session", "test");
+                jsonResponse.put("session", username);
 
                 jsonResponse.put("token", uid);
                 jsonResponse.put("success", true);
@@ -92,12 +111,24 @@ public class SigmaHandler implements HttpHandler {
                 exchange.sendResponseHeaders(202, response.length());
                 break;
             case "/register":
-                jsonResponse.put("username", params.getOrDefault("username", "username"));
+                username = params.getOrDefault("username", "username");
+
+                jsonResponse.put("username", username);
                 jsonResponse.put("password", params.getOrDefault("password", "123"));
                 jsonResponse.put("email", params.getOrDefault("email", "emailxD@gmail.com"));
                 jsonResponse.put("token", uid);
                 jsonResponse.put("success", true);
-                jsonResponse.put("premium", true);
+
+                response = jsonResponse.toString();
+                exchange.sendResponseHeaders(202, response.length());
+                break;
+            case "/claim_premium":
+                jsonResponse.put("success", true);
+                jsonResponse.put("session", username);
+                jsonResponse.put("username", username);
+                jsonResponse.put("auth_token", uid);
+                jsonResponse.put("agora_token", uid);
+                jsonResponse.put("challengeAnswer", Main.generatedCaptcha.getCode());
 
                 response = jsonResponse.toString();
                 exchange.sendResponseHeaders(202, response.length());
@@ -128,7 +159,7 @@ public class SigmaHandler implements HttpHandler {
 
     private String getConfig(String configName) {
         try {
-            InputStream inputStream = ClassLoader.getSystemClassLoader().getResourceAsStream(configName + ".profile");
+            InputStream inputStream = ClassLoader.getSystemClassLoader().getResourceAsStream("profiles/" + configName + ".profile");
             String content = getChangelog();
 
             if (inputStream != null) {
