@@ -8,7 +8,10 @@ import org.json.JSONObject;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -46,9 +49,6 @@ public class SigmaHandler implements HttpHandler {
 
             response = content;
             exchange.sendResponseHeaders(202, response.length());
-        } else if (uri.contains("/profiles.php?v=")) {
-            response = "[\"Intave\", \"BlocksMC\", \"LibreCraft\", \"Mineland\", \"Minemenclub\", \"NoRules\", \"Vulcan\"]";
-            exchange.sendResponseHeaders(202, response.length());
         } else if (uri.contains("/captcha/") && uri.endsWith(".png")) {
             BufferedImage captchaImage = Main.generatedCaptcha.getImage();
             if (captchaImage != null) {
@@ -62,25 +62,20 @@ public class SigmaHandler implements HttpHandler {
                 exchange.sendResponseHeaders(404, -1);
                 return;
             }
+        } else if (uri.contains("/profiles.php?v=")) {
+            response = "[\"Intave\", \"BlocksMC\", \"LibreCraft\", \"Mineland\", \"Minemenclub\", \"NoRules\", \"Vulcan\", \"Old Hypixel\"]";
+            exchange.sendResponseHeaders(202, response.length());
         } else {
             if (uri.contains("/profiles/") && uri.contains(".profile")) {
-                if (uri.contains("Intave")) {
-                    response = getConfig("Intave");
-                } else if (uri.contains("BlocksMC")) {
-                    response = getConfig("BlocksMC");
-                } else if (uri.contains("LibreCraft")) {
-                    response = getConfig("LibreCraft");
-                } else if (uri.contains("Mineland")) {
-                    response = getConfig("Mineland");
-                } else if (uri.contains("Minemenclub")) {
-                    response = getConfig("Minemenclub");
-                } else if (uri.contains("NoRules")) {
-                    response = getConfig("NoRules");
-                } else if (uri.contains("Vulcan")) {
-                    response = getConfig("Vulcan");
-                }
+                String[] servers = {"Intave", "BlocksMC", "LibreCraft", "Mineland", "Minemenclub", "NoRules", "Vulcan", "Old Hypixel"};
 
-                exchange.sendResponseHeaders(202, response.length());
+                for (String server : servers) {
+                    if (uri.contains(server)) {
+                        response = getConfig(server);
+                        exchange.sendResponseHeaders(202, response.length());
+                        break;
+                    }
+                }
             }
         }
 
