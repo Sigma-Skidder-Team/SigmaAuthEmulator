@@ -1,9 +1,9 @@
-import com.mentalfrostbyte.Main;
+import team.skidma.Emulator;
 
 public class Start {
 
     public static void main(String[] args) throws Exception {
-        Main.main(args);
+        Emulator.main(args);
     }
 
 }
