@@ -6,10 +6,6 @@ import javax.swing.*;
  * @author Knezo
  */
 public class VisualLogs {
-    public static void displayError(String reason) {
-        displayError(reason, "Error!");
-    }
-
     public static void displayError(String reason, String title) {
         JOptionPane.showMessageDialog(null, reason, title, JOptionPane.ERROR_MESSAGE);
     }

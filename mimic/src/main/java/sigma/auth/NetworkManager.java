@@ -212,13 +212,16 @@ public class NetworkManager {
         try {
             HttpPost request = new HttpPost(this.claimPremiumUrl);
             List<BasicNameValuePair> pairs = new ArrayList<>();
+
             pairs.add(new BasicNameValuePair("key", key));
             pairs.add(new BasicNameValuePair("challengeUid", captcha.getChallengeUid()));
             pairs.add(new BasicNameValuePair("challengeAnswer", captcha.getUserAnswer()));
             pairs.add(new BasicNameValuePair("token", this.token));
             captcha.setCaptchaValidity(false);
+
             request.setEntity(new UrlEncodedFormEntity(pairs, StandardCharsets.UTF_8));
             HttpEntity entity = this.httpClient.execute(request).getEntity();
+
             if (entity != null) {
                 try (InputStream content = entity.getContent()) {
                     JSONObject jsonObject = new JSONObject(IOUtils.toString(content, StandardCharsets.UTF_8));
@@ -282,13 +285,13 @@ public class NetworkManager {
 
                     if (jsonObject.getBoolean("success")) {
                         String uid = jsonObject.getString("uid");
-                        boolean completed = false;
+                        boolean needCaptcha = false;
 
                         if (jsonObject.has("captcha")) {
-                            completed = jsonObject.getBoolean("captcha");
+                            needCaptcha = jsonObject.getBoolean("captcha");
                         }
 
-                        this.captcha = new CaptchaChecker(uid, completed);
+                        this.captcha = new CaptchaChecker(uid, needCaptcha);
                         return this.captcha;
                     }
                     return null;

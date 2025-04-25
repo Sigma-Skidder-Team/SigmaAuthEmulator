@@ -28,7 +28,6 @@ public class Encryptor {
 
     public Encryptor(final byte[] input) {
         final byte[] copy = Arrays.copyOf(HardwareIDGenerator.generateHardwareID("mcAzMFSvCM6wFCHcgzOn"), 16);
-        System.out.println(Arrays.toString(HardwareIDGenerator.generateHardwareID("mcAzMFSvCM6wFCHcgzOn")));
         final byte[] bytes = "jelloconnectvect".getBytes();
         final SecretKeySpec key = new SecretKeySpec(copy, "AES");
         try {

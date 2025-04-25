@@ -11,28 +11,28 @@ import java.net.URL;
 
 public class CaptchaChecker {
 
-    private final String challengeUid;
+    private final String uid;
     private final long timestamp = System.currentTimeMillis();
-    private final boolean isCaptchaRequiredFromServer;
+    private final boolean needCaptcha;
 
     private boolean captchaIsStillValid = true;
-    private boolean solved;
 
     private String userAnswer = "";
     private BufferedImage downloadedImage;
     private Texture texture;
 
-    public CaptchaChecker(final String challengeUid, final boolean isCaptchaAlreadySolved) {
-        this.challengeUid = challengeUid;
-        this.solved = isCaptchaAlreadySolved;
-        this.isCaptchaRequiredFromServer = !isCaptchaAlreadySolved;
+    public CaptchaChecker(String uid, boolean needCaptcha) {
+        this.uid = uid;
+        this.needCaptcha = needCaptcha;
 
-        if (isCaptchaAlreadySolved) {
+        if (needCaptcha) {
             new Thread(() -> {
                 try {
-                    URL imageUrl = new URL("https://jelloprg.sigmaclient.info/captcha/" + challengeUid + ".png");
+                    URL imageUrl = new URL("https://jelloprg.sigmaclient.info/captcha/" + uid + ".png");
                     this.downloadedImage = ImageIO.read(imageUrl);
-                } catch (IOException ignored) {
+                    System.out.println(this.downloadedImage != null ? "got " + uid + ".png" : "image null");
+                } catch (IOException exc) {
+                    exc.printStackTrace();
                 }
             }).start();
         }
@@ -61,7 +61,7 @@ public class CaptchaChecker {
     }
 
     public boolean isCaptchaRequired() {
-        return this.isCaptchaRequiredFromServer;
+        return this.needCaptcha;
     }
 
     public boolean isCaptchaStillValid() {
@@ -81,7 +81,10 @@ public class CaptchaChecker {
     }
 
     public String getChallengeUid() {
-        return this.challengeUid;
+        return this.uid;
     }
 
+    public BufferedImage getDownloadedImage() {
+        return downloadedImage;
+    }
 }
