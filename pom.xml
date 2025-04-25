@@ -7,12 +7,18 @@
     <groupId>team.skidma</groupId>
     <artifactId>SigmaAuthEmulator</artifactId>
     <version>v2</version>
+    <packaging>pom</packaging>
+    <modules>
+        <module>emulator</module>
+        <module>mimic</module>
+    </modules>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.release>8</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
 
     <build>
         <plugins>
@@ -55,36 +61,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <dependencies>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.13.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.5.13</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore</artifactId>
-            <version>4.3.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15to18</artifactId>
-            <version>1.76</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpkix-jdk15to18</artifactId>
-            <version>1.76</version>
-        </dependency>
-    </dependencies>
 </project>

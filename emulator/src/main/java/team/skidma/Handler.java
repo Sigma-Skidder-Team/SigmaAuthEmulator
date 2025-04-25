@@ -21,6 +21,12 @@ public class Handler implements HttpHandler {
         String email = "unknown";
         String password = "unknown";
 
+        if (Emulator.INSTANCE.account != null) {
+            username = Emulator.INSTANCE.account.username;
+            email = Emulator.INSTANCE.account.email;
+            password = Emulator.INSTANCE.account.password;
+        }
+
         String requestBody = inputStreamToString(exchange.getRequestBody());
         if (!requestBody.isEmpty()) {
             Emulator.LOGGER.log(Level.DEBUG, "Incoming " + type + " request: " + url);
