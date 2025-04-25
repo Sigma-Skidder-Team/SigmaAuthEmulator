@@ -8,11 +8,12 @@ import team.skidma.util.app.Level;
 
 import java.io.*;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 public class Handler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        String response = "{}"; //fallback to empty json object
+        String response; //fallback to empty json object
 
         String url = exchange.getRequestURI().toString();
         String type = exchange.getRequestMethod();
@@ -58,23 +59,34 @@ public class Handler implements HttpHandler {
 
         if (url.contains("changelog")) {
             response = ChangelogUtil.getChangelog();
-        } else if (url.contains("login")) {
-            JsonObject jsonResponse = new JsonObject();
-            if (Emulator.INSTANCE.account == null) {
-                jsonResponse.addProperty("success", false);
-                jsonResponse.addProperty("error", "Not registered!");
-            } else {
-                jsonResponse.addProperty("success", true);
-                jsonResponse.addProperty("session", "yessir");
+        } else if (url.contains("captcha") && url.endsWith(".png")) {
+            String filename = "454babc4-24ea-42a1-85b6-249292fc5a81.png";
+            InputStream imageStream = getClass().getClassLoader().getResourceAsStream(filename);
 
-                if (Emulator.INSTANCE.account.premium) {
-                    jsonResponse.addProperty("premium", true);
+            if (imageStream != null) {
+                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                byte[] temp = new byte[4096];
+                int read;
+                while ((read = imageStream.read(temp)) != -1) {
+                    buffer.write(temp, 0, read);
                 }
+                byte[] imageBytes = buffer.toByteArray();
 
-                jsonResponse.addProperty("username", username);
-                jsonResponse.addProperty("auth_token", "d4612b25-4101-44cd-badd-d9234a6ad8c6");
-                jsonResponse.addProperty("agora_token", "e42cacf9-12a9-4cc0-b860-533915a1ba35");
+                exchange.getResponseHeaders().add("Content-Type", "image/png");
+                exchange.sendResponseHeaders(200, imageBytes.length);
+                OutputStream os = exchange.getResponseBody();
+                os.write(imageBytes);
+                os.close();
+                imageStream.close();
+            } else {
+                byte[] err = "Image not found".getBytes(StandardCharsets.UTF_8);
+                exchange.sendResponseHeaders(404, err.length);
+                exchange.getResponseBody().write(err);
+                exchange.getResponseBody().close();
             }
+            return;
+        } else if (url.contains("login")) {
+            JsonObject jsonResponse = getJsonObject(username);
 
             response = jsonResponse.toString();
         } else if (url.contains("register")) {
@@ -110,7 +122,7 @@ public class Handler implements HttpHandler {
         } else {
             JsonObject jsonResponse = new JsonObject();
             jsonResponse.addProperty("success", true);
-            //to bypass the ("https://jelloprg.sigmaclient.info/captcha/" + uid + ".png") thing
+            //we later send 454babc4-24ea-42a1-85b6-249292fc5a81.png so don't change this
             jsonResponse.addProperty("uid", "454babc4-24ea-42a1-85b6-249292fc5a81");
             jsonResponse.addProperty("captcha", false);
 
@@ -127,6 +139,26 @@ public class Handler implements HttpHandler {
         OutputStream os = exchange.getResponseBody();
         os.write(response.getBytes());
         os.close();
+    }
+
+    private static JsonObject getJsonObject(String username) {
+        JsonObject jsonResponse = new JsonObject();
+        if (Emulator.INSTANCE.account == null) {
+            jsonResponse.addProperty("success", false);
+            jsonResponse.addProperty("error", "Not registered!");
+        } else {
+            jsonResponse.addProperty("success", true);
+            jsonResponse.addProperty("session", "yessir");
+
+            if (Emulator.INSTANCE.account.premium) {
+                jsonResponse.addProperty("premium", true);
+            }
+
+            jsonResponse.addProperty("username", username);
+            jsonResponse.addProperty("auth_token", "d4612b25-4101-44cd-badd-d9234a6ad8c6");
+            jsonResponse.addProperty("agora_token", "e42cacf9-12a9-4cc0-b860-533915a1ba35");
+        }
+        return jsonResponse;
     }
 
     private String inputStreamToString(InputStream input) throws IOException {
