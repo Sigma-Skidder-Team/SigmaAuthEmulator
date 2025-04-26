@@ -124,7 +124,6 @@ public class Handler implements HttpHandler {
             jsonResponse.addProperty("success", true);
             //we later send 454babc4-24ea-42a1-85b6-249292fc5a81.png so don't change this
             jsonResponse.addProperty("uid", "454babc4-24ea-42a1-85b6-249292fc5a81");
-            jsonResponse.addProperty("captcha", false);
 
             response = jsonResponse.toString();
         }
@@ -149,10 +148,7 @@ public class Handler implements HttpHandler {
         } else {
             jsonResponse.addProperty("success", true);
             jsonResponse.addProperty("session", "yessir");
-
-            if (Emulator.INSTANCE.account.premium) {
-                jsonResponse.addProperty("premium", true);
-            }
+            jsonResponse.addProperty("premium", Emulator.INSTANCE.account.premium);
 
             jsonResponse.addProperty("username", username);
             jsonResponse.addProperty("auth_token", "d4612b25-4101-44cd-badd-d9234a6ad8c6");
