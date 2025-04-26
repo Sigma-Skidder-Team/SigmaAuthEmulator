@@ -76,7 +76,7 @@ public class NetworkManager {
             if (entity != null) {
                 try (InputStream content = entity.getContent()) {
                     String formattedContent = IOUtils.toString(content, StandardCharsets.UTF_8);
-                    JSONObject jsonObject = new JSONObject(formattedContent);
+                    PremiumCheckerJSONObject jsonObject = new PremiumCheckerJSONObject(formattedContent);
 
                     if (jsonObject.getBoolean("success")) {
                         if (jsonObject.has("premium")) {
@@ -124,7 +124,7 @@ public class NetworkManager {
             HttpEntity entity = this.httpClient.execute(request).getEntity();
             if (entity != null) {
                 try (InputStream content = entity.getContent()) {
-                    JSONObject jsonObject = new JSONObject(IOUtils.toString(content, StandardCharsets.UTF_8));
+                    PremiumCheckerJSONObject jsonObject = new PremiumCheckerJSONObject(IOUtils.toString(content, StandardCharsets.UTF_8));
 
                     if (jsonObject.getBoolean("success")) {
                         this.handleLoginResponse(jsonObject);
@@ -160,7 +160,7 @@ public class NetworkManager {
             if (entity != null) {
                 try (InputStream content = entity.getContent()) {
                     String formattedContent = IOUtils.toString(content, StandardCharsets.UTF_8);
-                    JSONObject jsonObject = new JSONObject(formattedContent);
+                    PremiumCheckerJSONObject jsonObject = new PremiumCheckerJSONObject(formattedContent);
 
                     if (jsonObject.getBoolean("success")) {
                         if (jsonObject.has("premium")) {
@@ -224,7 +224,7 @@ public class NetworkManager {
 
             if (entity != null) {
                 try (InputStream content = entity.getContent()) {
-                    JSONObject jsonObject = new JSONObject(IOUtils.toString(content, StandardCharsets.UTF_8));
+                    PremiumCheckerJSONObject jsonObject = new PremiumCheckerJSONObject(IOUtils.toString(content, StandardCharsets.UTF_8));
 
                     if (jsonObject.getBoolean("success")) {
                         this.handleLoginResponse(jsonObject);
@@ -281,7 +281,7 @@ public class NetworkManager {
             HttpEntity entity = this.httpClient.execute(request).getEntity();
             if (entity != null) {
                 try (InputStream content = entity.getContent()) {
-                    JSONObject jsonObject = new JSONObject(IOUtils.toString(content, StandardCharsets.UTF_8));
+                    PremiumCheckerJSONObject jsonObject = new PremiumCheckerJSONObject(IOUtils.toString(content, StandardCharsets.UTF_8));
 
                     if (jsonObject.getBoolean("success")) {
                         String uid = jsonObject.getString("uid");
@@ -303,18 +303,18 @@ public class NetworkManager {
         return null;
     }
 
-    public void handleLoginResponse(final JSONObject JSONObject) throws JSONException {
+    public void handleLoginResponse(final JSONObject json) throws JSONException {
         String authToken = null;
         String username = null;
         String agoraToken = null;
-        if (JSONObject.has("username")) {
-            username = JSONObject.getString("username");
+        if (json.has("username")) {
+            username = json.getString("username");
         }
-        if (JSONObject.has("auth_token")) {
-            authToken = JSONObject.getString("auth_token");
+        if (json.has("auth_token")) {
+            authToken = json.getString("auth_token");
         }
-        if (JSONObject.has("agora_token")) {
-            agoraToken = JSONObject.getString("agora_token");
+        if (json.has("agora_token")) {
+            agoraToken = json.getString("agora_token");
         }
         if (authToken != null && username != null && agoraToken != null) {
             try {
@@ -323,8 +323,8 @@ public class NetworkManager {
             } catch (final IOException ex) {
             }
         }
-        if (JSONObject.has("session")) {
-            this.validateSession(JSONObject.getString("session"));
+        if (json.has("session")) {
+            this.validateSession(json.getString("session"));
         }
     }
 
