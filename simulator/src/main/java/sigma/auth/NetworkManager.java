@@ -11,7 +11,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import sigma.auth.encryption.Encryptor;
 import sigma.auth.json.PremiumJSONObject;
-import sigma.irc.IRCManager;
 import totalcross.json.JSONException;
 import totalcross.json.JSONObject;
 
@@ -27,10 +26,8 @@ import java.util.UUID;
 public class NetworkManager {
 
     public HttpClient httpClient;
-    public CaptchaChecker captcha;
+    public Challenge captcha;
     public Encryptor encryptor;
-    public String field38425;
-    public IRCManager IRCManager;
 
     public String mainURL;
     public String loginUrl;
@@ -53,11 +50,7 @@ public class NetworkManager {
         this.httpClient = HttpClients.createDefault();
     }
 
-    public void init() {
-        this.IRCManager = new IRCManager();
-    }
-
-    public String login(String username, String password, CaptchaChecker captcha) {
+    public String login(String username, String password, Challenge challenge) {
         String errorMSG = "Unexpected error";
 
         try {
@@ -65,11 +58,11 @@ public class NetworkManager {
             List<BasicNameValuePair> pairs = new ArrayList<>();
             pairs.add(new BasicNameValuePair("username", username));
             pairs.add(new BasicNameValuePair("password", password));
-            pairs.add(new BasicNameValuePair("challengeUid", captcha.getChallengeUid()));
-            pairs.add(new BasicNameValuePair("challengeAnswer", captcha.getUserAnswer()));
+            pairs.add(new BasicNameValuePair("challengeUid", challenge.getUid()));
+            pairs.add(new BasicNameValuePair("challengeAnswer", challenge.getAnswer()));
             pairs.add(new BasicNameValuePair("token", this.token));
 
-            captcha.setCaptchaValidity(false);
+            challenge.setValid(false);
             request.setEntity(new UrlEncodedFormEntity(pairs, StandardCharsets.UTF_8));
 
             HttpResponse response = this.httpClient.execute(request);
@@ -104,7 +97,7 @@ public class NetworkManager {
         return errorMSG;
     }
 
-    public String register(String username, String password, String email, CaptchaChecker captcha) {
+    public String register(String username, String password, String email, Challenge challenge) {
         if (email == null) {
             email = "";
         }
@@ -117,11 +110,11 @@ public class NetworkManager {
             pairs.add(new BasicNameValuePair("username", username));
             pairs.add(new BasicNameValuePair("password", password));
             pairs.add(new BasicNameValuePair("email", email));
-            pairs.add(new BasicNameValuePair("challengeUid", captcha.getChallengeUid()));
-            pairs.add(new BasicNameValuePair("challengeAnswer", captcha.getUserAnswer()));
+            pairs.add(new BasicNameValuePair("challengeUid", challenge.getUid()));
+            pairs.add(new BasicNameValuePair("challengeAnswer", challenge.getAnswer()));
             pairs.add(new BasicNameValuePair("token", this.token));
 
-            captcha.setCaptchaValidity(false);
+            challenge.setValid(false);
             request.setEntity(new UrlEncodedFormEntity(pairs, StandardCharsets.UTF_8));
 
             HttpEntity entity = this.httpClient.execute(request).getEntity();
@@ -209,7 +202,7 @@ public class NetworkManager {
         }
     }
 
-    public String premium(String key, CaptchaChecker captcha) {
+    public String premium(String key, Challenge challenge) {
         String errorMSG = "Unexpected error";
 
         try {
@@ -217,10 +210,10 @@ public class NetworkManager {
             List<BasicNameValuePair> pairs = new ArrayList<>();
 
             pairs.add(new BasicNameValuePair("key", key));
-            pairs.add(new BasicNameValuePair("challengeUid", captcha.getChallengeUid()));
-            pairs.add(new BasicNameValuePair("challengeAnswer", captcha.getUserAnswer()));
+            pairs.add(new BasicNameValuePair("challengeUid", challenge.getUid()));
+            pairs.add(new BasicNameValuePair("challengeAnswer", challenge.getAnswer()));
             pairs.add(new BasicNameValuePair("token", this.token));
-            captcha.setCaptchaValidity(false);
+            challenge.setValid(false);
 
             request.setEntity(new UrlEncodedFormEntity(pairs, StandardCharsets.UTF_8));
             HttpEntity entity = this.httpClient.execute(request).getEntity();
@@ -270,8 +263,8 @@ public class NetworkManager {
         }
     }
 
-    public CaptchaChecker getCaptcha() {
-        if (this.captcha != null && this.captcha.isCaptchaStillValid()) {
+    public Challenge getCaptcha() {
+        if (this.captcha != null && this.captcha.isValid()) {
             return this.captcha;
         }
 
@@ -288,20 +281,20 @@ public class NetworkManager {
 
                     if (jsonObject.getBoolean("success")) {
                         String uid = jsonObject.getString("uid");
-                        boolean needCaptcha = false;
+                        boolean captcha = false;
 
                         if (jsonObject.has("captcha")) {
-                            needCaptcha = jsonObject.getBoolean("captcha");
+                            captcha = jsonObject.getBoolean("captcha");
                         }
 
-                        this.captcha = new CaptchaChecker(uid, needCaptcha);
+                        this.captcha = new Challenge(uid, captcha);
                         return this.captcha;
                     }
                     return null;
                 }
             }
-        } catch (IOException exc) {
-            exc.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return null;
     }

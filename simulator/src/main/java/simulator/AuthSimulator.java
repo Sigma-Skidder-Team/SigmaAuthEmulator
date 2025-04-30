@@ -2,7 +2,7 @@ package simulator;
 
 import simulator.impl.*;
 import sigma.Client;
-import sigma.auth.CaptchaChecker;
+import sigma.auth.Challenge;
 import sigma.event.SecondEvent;
 
 import javax.swing.*;
@@ -26,9 +26,9 @@ public class AuthSimulator extends JFrame {
         tabs.add("Login", new LoginTab(captchaRequired, tabs));
         tabs.add("Redeem", new RedeemTab(captchaRequired, tabs));
 
-        CaptchaChecker captcha = Client.getInstance().licenseManager.getCaptcha();
-        if (captcha != null) {
-            this.captchaRequired = captcha.isCaptchaRequired();
+        Challenge challenge = Client.getInstance().licenseManager.getCaptcha();
+        if (challenge != null) {
+            this.captchaRequired = challenge.isCaptcha();
         }
 
         add(tabs);

@@ -2,7 +2,7 @@ package simulator.impl;
 
 import simulator.utils.VisualLogs;
 import sigma.Client;
-import sigma.auth.CaptchaChecker;
+import sigma.auth.Challenge;
 
 import javax.swing.*;
 import java.awt.image.BufferedImage;
@@ -47,9 +47,9 @@ public class LoginTab extends JPanel {
         String password = new String(this.password.getPassword());
 
         new Thread(() -> {
-            CaptchaChecker captcha = Client.getInstance().licenseManager.getCaptcha();
+            Challenge captcha = Client.getInstance().licenseManager.getCaptcha();
             if (captcha != null) {
-                captcha.setUserAnswer(this.captcha.getText());
+                captcha.setAnswer(this.captcha.getText());
             }
 
             String errorMSG = Client.getInstance().licenseManager.login(username.getText(), password, captcha);
