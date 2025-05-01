@@ -42,3 +42,4 @@ build/
 backup/
 *.pem
 *.exe
+*.lic
