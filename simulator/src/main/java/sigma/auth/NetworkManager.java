@@ -66,7 +66,6 @@ public class NetworkManager {
             request.setEntity(new UrlEncodedFormEntity(pairs, StandardCharsets.UTF_8));
 
             HttpResponse response = this.httpClient.execute(request);
-
             HttpEntity entity = response.getEntity();
 
             if (entity != null) {
@@ -76,8 +75,8 @@ public class NetworkManager {
 
                     if (jsonObject.getBoolean("success")) {
                         if (jsonObject.has("premium")) {
-                            boolean isPremium = jsonObject.getBoolean("premium");
-                            new Thread(new PremiumChecker(isPremium)).start();
+                            boolean premium = jsonObject.getBoolean("premium");
+                            new Thread(new PremiumChecker(premium)).start();
                         }
 
                         this.handleLoginResponse(jsonObject);

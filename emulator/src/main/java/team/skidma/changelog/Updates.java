@@ -229,7 +229,7 @@ public class Updates {
 
     public static final UpdateEntry BETA_1 =
             new UpdateEntry(
-                    "5.0.0 Beta 2 Update",
+                    "5.0.0 Update",
                     Collections.singletonList("[Error] Cannot render changelog: More than 1000 changes are trying to be displayed at the same time. Are the developers insane ?")
             );
 
