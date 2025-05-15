@@ -41,3 +41,6 @@ build/
 *.jar
 
 backup/
+*.pem
+*.exe
+*.lic
